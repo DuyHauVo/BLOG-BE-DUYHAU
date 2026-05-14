@@ -25,13 +25,13 @@ async function bootstrap() {
 
   //cho pheps chayj ren post khac
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'], // Cho phép FE truy cập
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://blog-fe-duyhau.vercel.app'], // Cho phép FE truy cập
     credentials: true, // Nếu có dùng cookie
   });
 
   // ========== ⚙️ Thêm phần cấu hình Swagger ==========
   const config = new DocumentBuilder()
-    .setTitle('Tài liệu API cho hệ thống EatBacon') // tiêu đề tài liệu Swagger
+    .setTitle('Tài liệu API cho hệ thống Blog') // tiêu đề tài liệu Swagger
     .setDescription('Swagger mô tả các API trong backend của bạn')
     .setVersion('1.0')
     .addBearerAuth() // nếu bạn có dùng JWT
@@ -40,7 +40,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document); // tạo trang http://localhost:7777/api-docs
 
-  await app.listen(process.env.PORT ?? 7778); // Port mặc định
+  const port = process.env.PORT || 7777;
+  await app.listen(port, '0.0.0.0');
+  console.log(`Application is running on: http://localhost:${port}/api`);
 }
 bootstrap();
 
