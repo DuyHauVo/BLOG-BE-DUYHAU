@@ -23,6 +23,12 @@ async function bootstrap() {
   // Đặt tiền tố /api cho tất cả route (trừ trang chủ '/')
   app.setGlobalPrefix('api', { exclude: [''] });
 
+  //cho pheps chayj ren post khac
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://localhost:3001'], // Cho phép FE truy cập
+    credentials: true, // Nếu có dùng cookie
+  });
+
   // ========== ⚙️ Thêm phần cấu hình Swagger ==========
   const config = new DocumentBuilder()
     .setTitle('Tài liệu API cho hệ thống EatBacon') // tiêu đề tài liệu Swagger
@@ -33,7 +39,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document); // tạo trang http://localhost:7777/api-docs
-  
+
   await app.listen(process.env.PORT ?? 7778); // Port mặc định
 }
 bootstrap();

@@ -8,5 +8,5 @@ export class CreatePostDto {
   content: string;
 
   @IsOptional()
-  image: string;
+  images: string[];
 }

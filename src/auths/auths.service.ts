@@ -23,15 +23,28 @@ export class AuthsService {
     const payload = {
       sub: user._id,
       username: user.email,
-      pass: user.password,
       role: user.role,
     };
+    const token = this.jwtService.sign(payload);
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: token,
+      user_ID: user._id,
+      role: user.role,
     };
   }
 
   handleRegister = async (registerDTO: CreateAuthDto) => {
-    return await this.usersService.handleRegisterFromUser(registerDTO);
+    const user = await this.usersService.handleRegisterFromUser(registerDTO);
+    const payload = {
+      sub: user._id,
+      username: user.email,
+      role: user.role,
+    };
+    const token = this.jwtService.sign(payload);
+    return {
+      access_token: token,
+      user_ID: user._id,
+      role: user.role,
+    };
   };
 }

@@ -67,7 +67,34 @@ export class UsersService {
     return { results, TotalPages };
   }
 
+  async findAllByRole(query: any) {
+    const { filter, sort } = aqp(query);
+
+    if (filter.currenPage) delete filter.currenPage;
+    if (filter.Page) delete filter.Page;
+    if (filter.name) delete filter.name;
+
+    const TotalItems = (await this.UserModel.find(filter)).length;
+    const TotalPages = Math.ceil(TotalItems / query.currenPage);
+    const skip = (query.Page - 1) * query.currenPage;
+
+    const results = await this.UserModel.find(filter)
+      .limit(query.currenPage)
+      .skip(skip)
+      .select('-password')
+      .sort(sort as any); //Tìm kiếm sắp xếp theo thứ tự
+
+    return { results, TotalPages };
+  }
+
   async findOne(_id: string) {
+    if (mongoose.isValidObjectId(_id)) {
+      return await this.UserModel.findById({ _id }).select('-password');
+    } else {
+      throw new BadRequestException('ID KO ĐÚNG ĐỊNH DẠNG');
+    }
+  }
+  async findOneShow(_id: string) {
     if (mongoose.isValidObjectId(_id)) {
       return await this.UserModel.findById({ _id }).select('-password');
     } else {
@@ -100,6 +127,17 @@ export class UsersService {
   //   );
   // }
   async update(updateUserDto: UpdateUserDto, userID: string) {
+    if (updateUserDto.email) {
+      const emailOwner = await this.UserModel.findOne({
+        email: updateUserDto.email,
+        _id: { $ne: userID },
+      });
+
+      if (emailOwner) {
+        throw new BadRequestException(`Email da ton tai`);
+      }
+    }
+
     return await this.UserModel.updateOne(
       { _id: userID },
       { ...updateUserDto },
@@ -140,6 +178,8 @@ export class UsersService {
     // res
     return {
       _id: user._id,
+      email: user.email,
+      role: user.role,
     };
   }
 }

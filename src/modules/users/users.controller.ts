@@ -12,7 +12,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { queryDTO_User } from './dto/query-user.dto';
+import { queryDTO_User, queryDTO_User_By_Role } from './dto/query-user.dto';
 import { Public } from '@/auths/decorator/metadata';
 import { Role } from './helpers/utills';
 import { Roles } from '@/auths/decorator/roles.decorator';
@@ -27,8 +27,21 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Get()
+  // @Get()
+  // @Roles(Role.Admin)
+  // @Public()
+  // findAllByRole(@Query() query: queryDTO_User) {
+  //   return this.usersService.findAll(query);
+  // }
+
+  @Get('by_role')
   @Roles(Role.Admin)
+  findAllByRole(@Query() query: queryDTO_User_By_Role) {
+    return this.usersService.findAllByRole(query);
+  }
+
+  @Get()
+  @Public()
   findAll(@Query() query: queryDTO_User) {
     return this.usersService.findAll(query);
   }
@@ -38,11 +51,18 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Get('show/:id')
+  @Public()
+  findOneShow(@Param('id') id: string) {
+    return this.usersService.findOneShow(id);
+  }
+
   @Patch('me')
   update(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.user.userId;
     return this.usersService.update(updateUserDto, userId);
   }
+
   @Patch()
   @Roles(Role.Admin)
   updateUserByAdmin(

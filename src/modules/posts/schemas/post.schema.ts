@@ -11,8 +11,8 @@ export class Post {
   @Prop()
   content: string;
 
-  @Prop()
-  image: string;
+  @Prop([String])
+  images: string[];
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   author: Types.ObjectId;
